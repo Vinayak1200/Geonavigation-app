@@ -1,0 +1,175 @@
+@import url("resetpropage.css");
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background-image: url("https://t4.ftcdn.net/jpg/02/48/11/03/360_F_248110301_ON8MMUUAmDMyUSd4x2BblieSpquwdOXr.jpg");
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+}
+
+
+/* Login Card */
+.profile-card {
+    width: 450px;
+    background: #cc0000;
+    padding: 4rem;
+    border-radius: 10px;
+    position: relative;
+}
+
+.profile-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.66);
+    transform: rotate(-6deg);
+    border-radius: 10px;
+    z-index: -1;
+}
+/* ---------- */
+
+/* Login Card Logo */
+.profile-card-logo {
+    margin-bottom: 2rem;
+}
+
+.profile-card-logo img {
+    width: 200px;
+}
+/* ---------- */
+
+/* Login Card Standard */
+.profile-card-logo,
+.profile-card-header,
+.profile-card-footer {
+    text-align: center;
+}
+
+.profile-card a {
+    text-decoration: none;
+    color: #35339a;
+}
+
+.profile-card a:hover {
+    text-decoration: underline;
+}
+/* ---------- */
+
+/* Login Card Header */
+.profile-card-header {
+    margin-bottom: 2rem;
+}
+
+.profile-card-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.profile-card-header h1+div {
+    font-size: calc(1rem * .8);
+    opacity: .8;
+}
+/* ---------- */
+
+/* Login Card Form */
+.profile-card-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-card-form .form-item {
+    position: relative;
+}
+
+.profile-card-form .form-item .form-item-icon {
+    position: absolute;
+    top: .82rem;
+    left: 1.4rem;
+    font-size: 1.3rem;
+    opacity: .4;
+}
+
+.profile-card-form .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.profile-card-form .profile-item-other {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: calc(1rem * .8);
+    margin-bottom: .5rem;
+}
+/* ---------- */
+
+/* Login Card Footer */
+.profile-card-footer {
+    margin-top: 1.5rem;
+    font-size: calc(1rem * .8);
+}
+/* ---------- */
+
+/* Login Card Form Elements */
+.profile-card input[type="text"],
+.profile-card input[type="password"],
+.profile-card input[type="email"] {
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, .3);
+    padding: 1rem 1.5rem;
+    padding-left: calc(1rem * 3.5);
+    border-radius: 100px;
+    width: 100%;
+    transition: background .5s;
+}
+
+.profile-card input:focus {
+    background: white;
+}
+
+.profile-card input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: black;
+}
+
+.profile-card button {
+    background: black;
+    color: rgb(255, 255, 255);
+    padding: 1rem;
+    border-radius: 100px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: background .5s;
+    padding: 16px;
+}
+
+.profile-card button:hover {
+    background-color: rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    body {
+        padding: 2rem 0;
+    }
+
+    .profile-card {
+        width: 280px;
+        padding: 2rem;
+    }
+
+}
+/* ---------- */

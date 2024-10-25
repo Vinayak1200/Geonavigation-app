@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Perspective Map Tracking with Route</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        #map { width: 100%; height: 100vh; }
+        #startJourney {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            padding: 10px;
+            background: #cc0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<button id="startJourney">Start Journey</button>
+<div id="map"></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmluYXlhazEyMDAiLCJhIjoiY2xhOXo3YXVnMDJ2azNybzh3ODBpanF3ayJ9.3wPa3e8CFCAuj0lU3ZJv9A';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [75.556284, 31.345562], // Initial center coordinates
+        zoom: 14,
+        pitch: 60,
+        bearing: 0,
+    });
+
+    let userMarker, journeyStarted = false, routeLine;
+
+    document.getElementById('startJourney').onclick = async function () {
+        if (!journeyStarted) {
+            journeyStarted = true;
+
+            // Retrieve coordinates from localStorage
+            const sourceCoords = JSON.parse(localStorage.getItem('sourceCoords'));
+            const destinationCoords = JSON.parse(localStorage.getItem('destinationCoords'));
+            await getAndDrawRoute(sourceCoords, destinationCoords);
+            navigator.geolocation.watchPosition(updatePosition, handleError, { enableHighAccuracy: true });
+            } else {
+                alert("Source or destination coordinates not found!");
+                journeyStarted = false;
+            }
+        };
+
+    async function getAndDrawRoute(sourceCoords, destinationCoords) {
+        const directionsResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${sourceCoords[0]},${sourceCoords[1]};${destinationCoords[0]},${destinationCoords[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`);
+        const directionsData = await directionsResponse.json();
+
+        if (directionsData.routes.length > 0) {
+            const route = directionsData.routes[0].geometry;
+
+            if (routeLine) map.removeLayer('route');
+            map.addLayer({
+                id: 'route',
+                type: 'line',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: route,
+                    }
+                },
+                layout: { 'line-join': 'round', 'line-cap': 'round' },
+                paint: { 'line-color': '#3887be', 'line-width': 5, 'line-opacity': 0.7 }
+            });
+        } else {
+            alert('No route found!');
+        }
+    }
+
+    function updatePosition(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const heading = position.coords.heading || map.getBearing();
+
+        // Create or update the user marker
+        if (!userMarker) {
+            userMarker = new mapboxgl.Marker().setLngLat([lon, lat]).addTo(map);
+        } else {
+            userMarker.setLngLat([lon, lat]);
+        }
+
+        // Smoothly adjust the map's center and bearing
+        map.easeTo({
+            center: [lon, lat],
+            bearing: heading, // Update bearing based on the user's heading
+            pitch: 60,
+            zoom: 15,
+            duration: 1000 // Duration of the animation
+        });
+    }
+
+    function handleError(error) {
+        console.error("Geolocation error: " + error.message);
+        alert("Unable to get your location. Please check GPS settings.");
+    }
+</script>
+
+</body>
+</html>

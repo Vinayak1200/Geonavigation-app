@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Weather</title>
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'api/weather.css' %}" />
+
+    <meta property="og:title" content="Weather cards" />
+    <meta
+      property="og:disc"
+      content="Cool weather cards which change when clicked on a day!"
+    />
+  </head>
+  <body>
+    <header class="bg-[#cc0000] text-stone-200 body-font">
+      <div
+        class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center"
+      >
+        <nav class="flex lg:w-2/5 flex-wrap items-center text-base md:ml-auto">
+          <a href="{% url 'WeatherData' %}" class="mr-5 hover:text-gray-900">Weather</a>
+          {% comment %} <a href="" class="mr-5 hover:text-gray-900">Hotels</a> {% endcomment %}
+          <a href="{% url 'reviews' %}" class="mr-5 hover:text-gray-900">Reviews</a>
+          <a href="{% url 'contactus' %}" class="hover:text-gray-900">Contact Us</a>
+        </nav>
+        <a
+          href="{% url 'landingpage' %}"
+          class="flex order-first lg:order-none lg:w-1/5 title-font font-medium items-center text-gray-900 lg:items-center lg:justify-center mb-4 md:mb-0"
+        >
+          <img src="{% static 'api/logo.png' %}" alt="SHAMBHALA" />
+        </a>
+        <div class="lg:w-2/5 inline-flex lg:justify-end ml-5 lg:ml-0">
+          <a href="{% url 'myprofile' %}"
+            ><button
+              class="inline-flex items-center hover:bg-black rounded hover:text-stone-200 border-0 py-1 px-3 focus:outline-none bg-gray-200 text-[#cc0000] mt-4 md:mt-0"
+            >
+              Profile
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                class="w-4 h-4 ml-1"
+                viewBox="0 0 24 24"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7"></path>
+              </svg></button
+          ></a>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="container">
+        <div class="card1">
+          <div class="left card sun">
+            <div class="overlay"></div>
+            <!-- title -->
+            <div class="title">
+              <i class="bx bx-sun box-icon" id="main_icon"></i>
+              <br />
+              <span class="title_header" id="main_header">{{weather.0}}</span>
+              <br />
+              <span class="title_disc" id="main_disc">Thursday</span>
+            </div>
+
+            <!-- content -->
+            <div class="content">
+              <span class="temp" id="temp">29°c</span>
+              <br />
+              <span class="location"
+                {% comment %} ><i class="bx bx-map"></i> Sydney, AUS</span {% endcomment %}
+              >
+            </div>
+          </div>
+
+          <div class="forecast">
+            <div class="details">
+              <div class="detail_type">
+                <span>STATUS</span>
+                <br />
+                <span>HUMIDITY</span>
+                <br />
+                <span>WIND</span>
+              </div>
+              <div class="detail_number">
+                <span>{{weather.1}}</span>
+                <br />
+                <span>{{weather.2}}</span>
+                <br />
+                <span>{{weather.3}} km/h</span>
+              </div>
+            </div>
+            <div class="weekly_status">
+              <button class="day weekly_item">
+                <i
+                  class="bx bx-sun day_sun box-icon"
+                  onclick="dayFuntion()"
+                ></i>
+                <br />
+                <span class="day_title">Thu</span>
+                <br />
+                <span class="day_temp">29°C</span>
+              </button>
+
+              <button class="rainy weekly_item" onclick="rainFunction()">
+                <i class="bx bx-cloud-light-rain box-icon"></i>
+                <br />
+                <span class="day_title">Fri</span>
+                <br />
+                <span class="day_temp">15°C</span>
+              </button>
+
+              <button class="thunder weekly_item">
+                <i
+                  class="bx bx-cloud-lightning box-icon"
+                  onclick="thunderFuntion()"
+                ></i>
+                <br />
+                <span class="day_title">Sat</span>
+                <br />
+                <span class="day_temp">10°C</span>
+              </button>
+
+              <button class="cloudy weekly_item" onclick="cloudFunction()">
+                <i class="bx bx-cloud box-icon"></i>
+                <br />
+                <span class="day_title">Sun</span>
+                <br />
+                <span class="day_temp">20°C</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <a
+      href="https://github.com/D3voluti0n/Weather-cards"
+      class="source"
+      target="blank"
+      >Source Code</a
+    >
+  </body>
+</html>

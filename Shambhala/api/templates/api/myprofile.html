@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'api/myprofile.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,600,0,0"
+    />
+
+    <title>My Profile Page</title>
+  </head>
+
+  <body>
+    <div class="Profile-container">
+      <div class="profile-card">
+        <div class="profile-card-logo">
+          <a href="{% url 'landingpage' %}"
+            ><img src="{% static 'api/logo.png' %}" alt="SHAMBHALA"
+          /></a>
+        </div>
+        <form class="profile-card-form">
+          <div class="form-item">
+            <span class="form-item-icon material-symbols-rounded">mail</span>
+            <p>
+                {{mail}}
+            </p>
+          </div>
+          <div class="form-item">
+            <span class="form-item-icon material-symbols-rounded">person</span>
+            <p>
+                {{name}}
+            </p>
+          </div>
+         <a href="{% url 'signup' %}"><button type="submit">Log Out</button></a>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="{% static 'api/welcome.css' %}" rel="stylesheet">
+
+    <!-- <div class="image" id="logoimg"> -->
+      <!-- <img src="{% static 'api/Shambhala.png' %}"> -->
+    <!-- </div> -->
+    
+
+    <main class="container">
+        <a href="{% url 'landingpage' %}" class="btn">
+          <span>Explore<br>the<br>world</span>
+        </a>
+      </main>
+
+
+      <script>
+        // Result Skip Results Iframe
+      const btn = document.querySelector(".btn");
+      
+      let rippleDiv;
+      
+      btn.addEventListener("mouseenter", (e) => {
+        //get the coordinates of the cursor
+        const left = e.clientX - e.target.getBoundingClientRect().left;
+        const top = e.clientY - e.target.getBoundingClientRect().top;
+      
+        rippleDiv = document.createElement("div");
+        rippleDiv.classList.add("ripple");
+        rippleDiv.style.left = `${left}px`;
+        rippleDiv.style.top = `${top}px`;
+      
+        btn.prepend(rippleDiv);
+      });
+
+      btn.addEventListener("mouseleave", () => {
+        btn.removeChild(rippleDiv);
+      });
+      </script>
+</html>

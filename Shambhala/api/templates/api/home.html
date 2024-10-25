@@ -1,0 +1,205 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <title>Shambhala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styles same as previous example */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: calc(100vh - 100px); /* Full height minus header */
+        }
+
+        header {
+            height: 80px;
+            background-color: #cc0000;
+            color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        .input-container {
+            position: absolute;
+            top: 95px;
+            left: 50px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-container input {
+            width: 200px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .input-container button {
+            padding: 5px;
+            margin-left: 5px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background: #b30000;
+        }
+
+        #startJourney {
+            margin-top: 10px;
+            background-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="nav-links">
+        <a href="#">Weather</a>
+        <a href="#">Reviews</a>
+        <a href="#">Contact Us</a>
+    </nav>
+    <a class="logo" href="/">
+        <img src="{% static 'api/logo.png' %}" alt="SHAMBHALA" style="height: 40px;">
+    </a>
+    <div>
+        <a href="#">
+            <button class="profile-button">Profile</button>
+        </a>
+    </div>
+</header>
+
+<!-- Input container for destination search -->
+<div class="input-container">
+    <input type="text" id="destination" placeholder="Enter your destination" />
+    <button id="getRoute">Get Route</button>
+
+    <a href="{% url 'journey_page' %}"><button id="startJourney">Start Journey</button></a>
+</div>
+
+<!-- Map container -->
+<div id="map"></div>
+
+<script>
+    var map = L.map('map');
+    var startMarker, routeLayer;
+
+    // Function to handle success in getting geolocation
+    function onLocationSuccess(position) {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+
+        map.setView([userLat, userLon], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        startMarker = L.marker([userLat, userLon]).addTo(map)
+            .bindPopup('Your Location')
+            .openPopup();
+
+        document.getElementById('getRoute').onclick = async function () {
+            const destination = document.getElementById('destination').value;
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${destination}`);
+            const data = await response.json();
+
+            if (data.length > 0) {
+                const endCoords = [data[0].lat, data[0].lon];
+                L.marker(endCoords).addTo(map).bindPopup(`Destination: ${destination}`).openPopup();
+
+                const routeResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${userLon},${userLat};${endCoords[1]},${endCoords[0]}?geometries=geojson&access_token=pk.eyJ1IjoidmluYXlhazEyMDAiLCJhIjoiY2xhOXo3YXVnMDJ2azNybzh3ODBpanF3ayJ9.3wPa3e8CFCAuj0lU3ZJv9A`);
+                const routeData = await routeResponse.json();
+
+                if (routeData.routes.length > 0) {
+                    if (routeLayer) {
+                        map.removeLayer(routeLayer);
+                    }
+                    console.log(routeData)
+                    routeLayer = L.geoJSON(routeData.routes[0].geometry, {
+                        style: { color: '#3887be', weight: 5, opacity: 0.7 }
+                    }).addTo(map);
+
+                    map.fitBounds(routeLayer.getBounds());
+
+
+                    // Set the local storage after successful route fetching
+                    localStorage.setItem('sourceCoords', JSON.stringify([userLon, userLat]));
+                    localStorage.setItem('destinationCoords', JSON.stringify([endCoords[1], endCoords[0]]));
+
+                    function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            const cookies = document.cookie.split(';');
+                            for (let i = 0; i < cookies.length; i++) {
+                                const cookie = cookies[i].trim();
+                                // Check if this cookie string begins with the name we want
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    async function sendDataToServer() {
+                        const sourceCoords = [userLon, userLat]
+                        const destinationCoords = [endCoords[1], endCoords[0]]
+                    
+                        const response = await fetch("{% url 'journey_page' %}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken') // Function to get CSRF token
+                            },
+                            body: JSON.stringify({
+                                sourceCoords: sourceCoords,
+                                destinationCoords: destinationCoords
+                            })
+                        });
+                
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log(data); 
+                        } else {
+                            console.error('Error:', response.statusText);
+                        }
+                    }
+                    sendDataToServer();
+                }
+            }
+        };
+    }
+
+    // Function to handle errors in getting geolocation
+    function onLocationError(error) {
+        console.error("Error getting location: ", error);
+        alert("Unable to retrieve your location. Please ensure location services are enabled.");
+    }
+
+    // Requesting the user's location
+    navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, {
+        enableHighAccuracy: true // Request high accuracy
+    });
+</script>
+</body>
+</html>
